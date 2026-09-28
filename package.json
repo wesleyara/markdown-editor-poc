@@ -1,0 +1,32 @@
+{
+  "name": "md-editor-poc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.48.0",
+    "highlight.js": "^11.12.0",
+    "katex": "^0.16.47",
+    "md-editor-v3": "^6.5.6",
+    "mermaid": "^12.0.0",
+    "vue": "^3.5.42"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.9.1",
+    "jsdom": "^27.0.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^4.0.0",
+    "vue-tsc": "^3.3.11"
+  }
+}
