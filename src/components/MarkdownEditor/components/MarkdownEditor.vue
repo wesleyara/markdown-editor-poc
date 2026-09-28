@@ -45,7 +45,7 @@ const previewFullscreen = ref(false)
 const lightbox = useTemplateRef('lightbox')
 
 function run(generator: InsertGenerator) {
-  // `insert` só existe com o editor montado; no modo preview voltamos pro editor primeiro.
+  // No modo preview o editor fica escondido; voltamos pra ele antes de inserir.
   if (viewMode.value !== 'editor') viewMode.value = 'editor'
   editorRef.value?.insert(generator)
 }
@@ -292,8 +292,10 @@ defineExpose(ctx)
       </div>
     </div>
 
+    <!-- v-show (e não v-if): o editor continua montado no modo preview, senão o CodeMirror é
+         recriado e o histórico de desfazer/refazer (Ctrl+Z / Ctrl+Y) se perde. -->
     <MdEditor
-      v-if="viewMode === 'editor'"
+      v-show="viewMode === 'editor'"
       ref="editorRef"
       :model-value="props.modelValue"
       :language="props.language"
@@ -313,7 +315,7 @@ defineExpose(ctx)
       @update:model-value="emit('update:modelValue', $event)"
     />
     <MdPreview
-      v-else
+      v-if="viewMode === 'preview'"
       :model-value="props.modelValue"
       :language="props.language"
       :theme="props.theme"

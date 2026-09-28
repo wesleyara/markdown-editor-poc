@@ -173,7 +173,7 @@ describe('MarkdownEditor', () => {
     const preview = wrapper!.findAll('button').find(b => b.text() === 'Preview')
     await preview!.trigger('click')
 
-    expect(wrapper!.find('.md-editor-stub').exists()).toBe(false)
+    expect(wrapper!.find('.md-editor-stub').isVisible()).toBe(false)
     expect(wrapper!.find('.md-editor-preview').text()).toBe('# Olá')
     expect(button('Bold').exists()).toBe(false)
   })
@@ -185,7 +185,19 @@ describe('MarkdownEditor', () => {
     ;(wrapper!.vm as unknown as { insert: (g: typeof md.bold) => void }).insert(md.bold)
     await wrapper!.vm.$nextTick()
 
-    expect(wrapper!.find('.md-editor-stub').exists()).toBe(true)
+    expect(wrapper!.find('.md-editor-stub').isVisible()).toBe(true)
+  })
+
+  it('mantém o mesmo editor montado ao ir e voltar do preview (preserva o Ctrl+Z)', async () => {
+    mountEditor()
+    const editorEl = wrapper!.find('.md-editor-stub').element
+    const tab = (label: string) => wrapper!.findAll('button').find(b => b.text() === label)!
+
+    await tab('Preview').trigger('click')
+    await tab('Editor').trigger('click')
+
+    expect(wrapper!.find('.md-editor-stub').element).toBe(editorEl)
+    expect(wrapper!.find('.md-editor-preview').exists()).toBe(false)
   })
 
   it('expõe getValue com o conteúdo atual', () => {
