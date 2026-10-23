@@ -222,48 +222,46 @@
 }
 
 .mde-root .md-editor-preview img,
-.mde-fullscreen .md-editor-preview img,
 .mde-view .md-editor-preview img {
   cursor: zoom-in;
 }
 
-/* ---------- preview em tela cheia ---------- */
+/* ---------- tela cheia (editor completo) ---------- */
 .mde-fullscreen {
   position: fixed;
   inset: 0;
   z-index: var(--mde-z);
   display: flex;
   flex-direction: column;
+  padding: 12px 24px;
   background: var(--mde-bg);
   color: var(--mde-text);
 }
 
-.mde-fullscreen-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--mde-border);
-}
-
-.mde-fullscreen-body {
+.mde-fullscreen > .mde-root {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.mde-fullscreen-content {
+.mde-expanded > .md-editor,
+.mde-expanded > .mde-preview {
+  flex: 1;
+  min-height: 0;
+}
+
+/* A caixa ocupa a largura toda; o texto fica numa coluna legível. */
+.mde-expanded .cm-content,
+.mde-expanded .md-editor-preview {
+  width: 100%;
   max-width: 64rem;
-  margin: 0 auto;
-  padding: 16px 24px;
+  margin-inline: auto !important;
 }
 
 @media (max-width: 640px) {
-  .mde-fullscreen-header,
-  .mde-fullscreen-content {
-    padding-left: 16px;
-    padding-right: 16px;
+  .mde-fullscreen {
+    padding: 8px 16px;
   }
 }
 

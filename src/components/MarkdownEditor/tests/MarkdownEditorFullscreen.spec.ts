@@ -1,19 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { afterEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
-import MarkdownEditorFullscreenPreview from '../components/MarkdownEditorFullscreenPreview.vue'
-
-vi.mock('md-editor-v3', () => ({
-  MdPreview: defineComponent({
-    name: 'MdPreview',
-    props: { modelValue: String },
-    setup: props => () => h('div', { class: 'md-editor-preview' }, [
-      h('p', props.modelValue),
-      h('img', { src: 'http://localhost/image.png' })
-    ])
-  })
-}))
+import MarkdownEditorFullscreen from '../components/MarkdownEditorFullscreen.vue'
 
 let wrapper: VueWrapper | undefined
 afterEach(() => {
@@ -22,15 +10,13 @@ afterEach(() => {
 })
 
 async function mountOpen() {
-  wrapper = mount(MarkdownEditorFullscreenPreview, {
+  wrapper = mount(MarkdownEditorFullscreen, {
     props: {
-      'modelValue': 'conteúdo',
       'theme': 'light',
-      'language': 'en-US',
-      'echarts': false,
       'open': false,
       'onUpdate:open': (value: boolean) => wrapper!.setProps({ open: value })
     },
+    slots: { default: '<p>conteúdo</p>' },
     attachTo: document.body
   })
   await wrapper.setProps({ open: true })
@@ -39,10 +25,10 @@ async function mountOpen() {
 
 const dialog = () => document.body.querySelector('.mde-fullscreen')
 
-describe('MarkdownEditorFullscreenPreview', () => {
+describe('MarkdownEditorFullscreen', () => {
   it('não renderiza nada fechado', () => {
-    wrapper = mount(MarkdownEditorFullscreenPreview, {
-      props: { modelValue: 'x', theme: 'light', language: 'en-US', echarts: false, open: false }
+    wrapper = mount(MarkdownEditorFullscreen, {
+      props: { theme: 'light', open: false }
     })
     expect(dialog()).toBeNull()
   })
@@ -69,11 +55,5 @@ describe('MarkdownEditorFullscreenPreview', () => {
     event.preventDefault()
     window.dispatchEvent(event)
     expect(wrapper!.emitted('update:open')).toBeUndefined()
-  })
-
-  it('emite imageClick ao clicar numa imagem', async () => {
-    await mountOpen()
-    ;(dialog()!.querySelector('img') as HTMLImageElement).click()
-    expect(wrapper!.emitted('imageClick')).toEqual([['http://localhost/image.png']])
   })
 })

@@ -4,7 +4,7 @@ O editor Markdown do ClickLocal, extraído num componente Vue 3 (projeto Vite `v
 independente de Nuxt e do Nuxt UI. É o mesmo editor, com os mesmos recursos:
 
 - **md-editor-v3** (CodeMirror 6) com uma toolbar própria e compacta;
-- abas **Editor / Preview** e botão para **expandir o preview em tela cheia**;
+- abas **Editor / Preview** e botão para **expandir o editor completo em tela cheia** (toolbar, Editor/Preview e coluna de texto legível);
 - **lightbox** para imagens do preview (zoom com roda do mouse ou duplo clique, arrastar);
 - **Mermaid** (diagramas), **KaTeX** (fórmulas) e **highlight.js** (código) funcionando **offline**:
   nada é baixado de CDN;
@@ -55,15 +55,15 @@ src/
 └── components/
     └── MarkdownEditor/
         ├── components/                        arquivos .vue (PascalCase)
-        │   ├── MarkdownEditor.vue             editor com toolbar, preview, tela cheia e lightbox
+        │   ├── MarkdownEditor.vue             editor com toolbar, preview, tela cheia (ele mesmo, em modo `expanded`) e lightbox
         │   ├── MarkdownView.vue               renderização somente leitura
-        │   ├── MarkdownEditorFullscreenPreview.vue  preview em tela cheia (Teleport para o body)
+        │   ├── MarkdownEditorFullscreen.vue         casca da tela cheia (Teleport para o body)
         │   ├── MarkdownEditorImageLightbox.vue      lightbox com zoom e arrastar
         │   └── MarkdownEditorDropdownMenu.vue       menu suspenso da toolbar
         ├── models/                            tipagens (kebab-case)
         │   ├── markdown-editor.models.ts      props/emits/expose do MarkdownEditor
         │   ├── markdown-view.models.ts
-        │   ├── markdown-editor-fullscreen-preview.models.ts
+        │   ├── markdown-editor-fullscreen.models.ts
         │   ├── markdown-editor-image-lightbox.models.ts
         │   ├── markdown-editor-dropdown-menu.models.ts
         │   ├── markdown-toolbar.models.ts     tipos públicos para estender a toolbar

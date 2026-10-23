@@ -41,7 +41,7 @@ afterEach(() => wrapper?.unmount())
 describe('MarkdownEditor', () => {
   it('renderiza a toolbar nativa e o editor', () => {
     mountEditor()
-    for (const title of ['Bold', 'Italic', 'Underline', 'Strikethrough', 'Headings', 'Bulleted list', 'Insert', 'Expand preview']) {
+    for (const title of ['Bold', 'Italic', 'Underline', 'Strikethrough', 'Headings', 'Bulleted list', 'Insert', 'Expand editor']) {
       expect(button(title).exists()).toBe(true)
     }
     expect(wrapper!.find('.md-editor-stub').text()).toBe('# Olá')
@@ -57,7 +57,7 @@ describe('MarkdownEditor', () => {
     mountEditor({ hideTools: ['bold', 'headings', 'fullscreen'] })
     expect(button('Bold').exists()).toBe(false)
     expect(button('Headings').exists()).toBe(false)
-    expect(button('Expand preview').exists()).toBe(false)
+    expect(button('Expand editor').exists()).toBe(false)
     expect(button('Italic').exists()).toBe(true)
   })
 
@@ -203,5 +203,20 @@ describe('MarkdownEditor', () => {
   it('expõe getValue com o conteúdo atual', () => {
     mountEditor({ modelValue: 'abc' })
     expect((wrapper!.vm as unknown as { getValue: () => string }).getValue()).toBe('abc')
+  })
+})
+
+describe('MarkdownEditor em tela cheia', () => {
+  it('abre o editor completo no body e recolhe pelo botão', async () => {
+    mountEditor({ modelValue: 'texto' })
+    await button('Expand editor').trigger('click')
+
+    const dialog = document.body.querySelector('.mde-fullscreen')!
+    expect(dialog.querySelector('button[title="Bold"]')).not.toBeNull()
+    expect(dialog.querySelector('button[title="Expand editor"]')).toBeNull()
+
+    ;(dialog.querySelector('button[title="Exit fullscreen (Esc)"]') as HTMLButtonElement).click()
+    await wrapper!.vm.$nextTick()
+    expect(document.body.querySelector('.mde-fullscreen')).toBeNull()
   })
 })

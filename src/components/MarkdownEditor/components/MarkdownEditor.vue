@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, useId, useTemplateRef } from 'vue'
 import type { Component } from 'vue'
 import { MdEditor, MdPreview } from 'md-editor-v3'
 import type { ExposeParam } from 'md-editor-v3'
 import {
   Bold, ChevronDown, Code, Ellipsis, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
-  Image, Italic, Link, List, ListOrdered, ListTodo, Maximize2, Plus, Quote, Sigma, SquareCode,
-  Strikethrough, Subscript, Superscript, Table, Underline, Workflow
+  Image, Italic, Link, List, ListOrdered, ListTodo, Maximize2, Minimize2, Plus, Quote, Sigma, SquareCode,
+  Strikethrough, Subscript, Superscript, Table, Underline, Video, Workflow
 } from '@lucide/vue'
 import { setupMarkdownEditor } from '../utils/setup'
 import * as md from '../utils/markdown-toolbar'
@@ -15,7 +15,7 @@ import type { BuiltinTool, InsertGenerator, ToolbarContext, ToolbarEntry, Toolba
 import type { MarkdownEditorEmits, MarkdownEditorProps, MarkdownEditorToolbarEntry, MarkdownEditorViewMode } from '../models/markdown-editor.models'
 import type { MarkdownEditorDropdownItem } from '../models/markdown-editor-dropdown-menu.models'
 import MarkdownEditorDropdownMenu from './MarkdownEditorDropdownMenu.vue'
-import MarkdownEditorFullscreenPreview from './MarkdownEditorFullscreenPreview.vue'
+import MarkdownEditorFullscreen from './MarkdownEditorFullscreen.vue'
 import MarkdownEditorImageLightbox from './MarkdownEditorImageLightbox.vue'
 
 setupMarkdownEditor()
@@ -34,14 +34,19 @@ const props = withDefaults(defineProps<MarkdownEditorProps>(), {
   hideTools: () => [],
   prettier: false,
   pluginsPlacement: 'menu',
-  echarts: false
+  echarts: false,
+  expanded: false,
+  initialMode: 'editor'
 })
 
 const emit = defineEmits<MarkdownEditorEmits>()
 
-const viewMode = ref<MarkdownEditorViewMode>('editor')
+const viewMode = ref<MarkdownEditorViewMode>(props.initialMode)
 const editorRef = useTemplateRef<ExposeParam>('editorRef')
-const previewFullscreen = ref(false)
+const expandedOpen = ref(false)
+// Cada instância precisa do próprio id: o md-editor deriva dele os ids do mermaid/DOM, e a cópia
+// em tela cheia colidiria com a inline.
+const editorId = `mde-${useId()}`
 const lightbox = useTemplateRef('lightbox')
 
 function run(generator: InsertGenerator) {
@@ -55,6 +60,23 @@ const ctx: ToolbarContext = {
   getValue: () => props.modelValue,
   setValue: value => emit('update:modelValue', value),
   focus: () => editorRef.value?.focus()
+}
+
+const videoInput = useTemplateRef<HTMLInputElement>('videoInput')
+
+// O upload de vídeo reaproveita `onUploadImg`; cada URL devolvida entra como `![video](url)`.
+function onVideoPicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = Array.from(input.files ?? [])
+  input.value = ''
+  if (!files.length || !props.onUploadImg) return
+  props.onUploadImg(files, (items) => {
+    const markdown = items
+      .map(item => (typeof item === 'string' ? item : item.url))
+      .map(url => `![video](${url})`)
+      .join('\n')
+    run(() => ({ targetValue: `${markdown}\n`, select: false, deviationStart: 0, deviationEnd: 0 }))
+  })
 }
 
 function openImage(src: string) {
@@ -132,6 +154,7 @@ const groups = computed<MarkdownEditorToolbarEntry[][]>(() => {
     builtinItem('codeBlock', 'Code block', SquareCode, md.codeBlock),
     builtinItem('link', 'Link', Link, md.link),
     builtinItem('image', 'Image', Image, md.image),
+    ...(props.onUploadImg ? [{ key: 'video', label: 'Video', icon: Video, onSelect: () => videoInput.value?.click() }] : []),
     builtinItem('table', 'Table', Table, md.table),
     builtinItem('mermaid', 'Diagram', Workflow, md.mermaid),
     builtinItem('katex', 'Formula', Sigma, md.katex)
@@ -182,7 +205,7 @@ defineExpose(ctx)
 <template>
   <div
     class="mde-root"
-    :class="{ 'mde-dark': props.theme === 'dark' }"
+    :class="{ 'mde-dark': props.theme === 'dark', 'mde-expanded': props.expanded }"
   >
     <div class="mde-toolbar">
       <div
@@ -277,14 +300,27 @@ defineExpose(ctx)
         >
           Preview
         </button>
-        <template v-if="!hidden.has('fullscreen')">
+        <template v-if="props.expanded">
+          <slot name="actions" />
           <div class="mde-divider" />
           <button
             type="button"
             class="mde-btn"
-            title="Expand preview"
-            aria-label="Expand preview"
-            @click="previewFullscreen = true"
+            title="Exit fullscreen (Esc)"
+            aria-label="Exit fullscreen"
+            @click="emit('collapse')"
+          >
+            <Minimize2 class="mde-icon" />
+          </button>
+        </template>
+        <template v-else-if="!hidden.has('fullscreen')">
+          <div class="mde-divider" />
+          <button
+            type="button"
+            class="mde-btn"
+            title="Expand editor"
+            aria-label="Expand editor"
+            @click="expandedOpen = true"
           >
             <Maximize2 class="mde-icon" />
           </button>
@@ -292,11 +328,20 @@ defineExpose(ctx)
       </div>
     </div>
 
+    <input
+      ref="videoInput"
+      type="file"
+      accept="video/mp4,video/webm"
+      hidden
+      @change="onVideoPicked"
+    >
+
     <!-- v-show (e não v-if): o editor continua montado no modo preview, senão o CodeMirror é
          recriado e o histórico de desfazer/refazer (Ctrl+Z / Ctrl+Y) se perde. -->
     <MdEditor
       v-show="viewMode === 'editor'"
       ref="editorRef"
+      :editor-id="editorId"
       :model-value="props.modelValue"
       :language="props.language"
       :theme="props.theme"
@@ -316,6 +361,7 @@ defineExpose(ctx)
     />
     <MdPreview
       v-if="viewMode === 'preview'"
+      :editor-id="editorId"
       :model-value="props.modelValue"
       :language="props.language"
       :theme="props.theme"
@@ -328,14 +374,37 @@ defineExpose(ctx)
       @click="onPreviewClick"
     />
 
-    <MarkdownEditorFullscreenPreview
-      v-model:open="previewFullscreen"
-      :model-value="props.modelValue"
+    <MarkdownEditorFullscreen
+      v-if="!props.expanded"
+      v-model:open="expandedOpen"
       :theme="props.theme"
-      :language="props.language"
-      :echarts="props.echarts"
-      @image-click="openImage"
-    />
+    >
+      <!-- Mesmo componente em tela cheia: herda props, plugins e modo atual, e devolve as edições. -->
+      <MarkdownEditor
+        v-bind="props"
+        expanded
+        :initial-mode="viewMode"
+        height="100%"
+        @update:model-value="emit('update:modelValue', $event)"
+        @collapse="expandedOpen = false"
+      >
+        <template #toolbar-start>
+          <slot
+            name="toolbar-start"
+            v-bind="ctx"
+          />
+        </template>
+        <template #toolbar-end>
+          <slot
+            name="toolbar-end"
+            v-bind="ctx"
+          />
+        </template>
+        <template #actions>
+          <slot name="actions" />
+        </template>
+      </MarkdownEditor>
+    </MarkdownEditorFullscreen>
     <MarkdownEditorImageLightbox ref="lightbox" />
   </div>
 </template>

@@ -92,4 +92,4 @@ export type BuiltinTool =
   // itens do menu "Heading"
   | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'sub' | 'sup'
   // itens do menu "Insert"
-  | 'quote' | 'codeInline' | 'codeBlock' | 'link' | 'image' | 'table' | 'mermaid' | 'katex'
+  | 'quote' | 'codeInline' | 'codeBlock' | 'link' | 'image' | 'video' | 'table' | 'mermaid' | 'katex'

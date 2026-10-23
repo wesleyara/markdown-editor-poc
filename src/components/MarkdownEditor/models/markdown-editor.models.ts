@@ -35,10 +35,17 @@ export interface MarkdownEditorProps {
   prettier?: boolean
   /** Blocos ```echarts. Também baixa do CDN, desligado por padrão. */
   echarts?: boolean
+  /** Uso interno: instância aberta em tela cheia (mostra "recolher" no lugar de "expandir" e
+   * limita o texto a uma coluna legível). */
+  expanded?: boolean
+  /** Uso interno: modo inicial (a instância expandida herda o da original). */
+  initialMode?: MarkdownEditorViewMode
 }
 
 export interface MarkdownEditorEmits {
   'update:modelValue': [value: string]
+  /** Só na instância expandida: pediu para sair da tela cheia. */
+  'collapse': []
 }
 
 /** Métodos expostos via `ref` — o mesmo contexto passado às ações da toolbar. */

@@ -6,9 +6,12 @@ import { config } from 'md-editor-v3'
 import mermaid from 'mermaid'
 import katex from 'katex'
 import hljs from 'highlight.js'
+import '@fontsource-variable/recursive'
 import 'katex/dist/katex.min.css'
 import hljsLight from 'highlight.js/styles/atom-one-light.css?inline'
 import hljsDark from 'highlight.js/styles/atom-one-dark.css?inline'
+
+const MERMAID_FONT = '"Recursive Variable", ui-monospace, Menlo, Consolas, monospace'
 
 let configured = false
 
@@ -16,7 +19,36 @@ export function setupMarkdownEditor() {
   if (configured) return
   configured = true
 
+  // A fonte é carregada sob demanda; o mermaid mede os rótulos na hora de renderizar, então um
+  // carregamento tardio deixa o texto mais largo que a caixa (rótulos cortados). Aquecemos já.
+  if (typeof document !== 'undefined') void document.fonts?.load('16px "Recursive Variable"')
+
   config({
+    // `![video](url)` vira um <video> reproduzível; uploads de vídeo são inseridos com esse alt.
+    markdownItConfig(md) {
+      const defaultImage = md.renderer.rules.image
+      md.renderer.rules.image = (tokens, idx, options, env, self) => {
+        const token = tokens[idx]!
+        if (token.content.trim().toLowerCase() === 'video') {
+          const src = md.utils.escapeHtml(token.attrGet('src') ?? '')
+          return `<video controls preload="metadata" src="${src}" style="max-width:100%"></video>`
+        }
+        return defaultImage ? defaultImage(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options)
+      }
+    },
+    // Visual do mermaid.live: look `neo` (nós arredondados, sombras suaves, traços nítidos).
+    mermaidConfig: base => ({
+      startOnLoad: false,
+      // O `base` do md-editor trazia theme + themeVariables que sobrescreveriam a paleta neo.
+      theme: base.theme === 'dark' ? 'neo-dark' : 'neo',
+      look: 'neo',
+      fontFamily: MERMAID_FONT,
+      themeVariables: { fontFamily: MERMAID_FONT },
+      // Rótulos SVG são medidos e desenhados com a mesma fonte, então ficam centralizados nos nós
+      // (os de foreignObject são medidos com outra fonte que a do CSS do editor).
+      htmlLabels: false,
+      flowchart: { ...base?.flowchart, htmlLabels: false, curve: 'basis', padding: 16 }
+    }),
     editorExtensions: {
       mermaid: { instance: mermaid },
       katex: { instance: katex },
