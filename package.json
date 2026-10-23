@@ -11,8 +11,10 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@codemirror/view": "^6.43.15",
     "@fontsource-variable/recursive": "^5.3.0",
     "@lucide/vue": "^1.48.0",
+    "@vavt/cm-extension": "^1.11.2",
     "highlight.js": "^11.12.0",
     "katex": "^0.16.47",
     "md-editor-v3": "^6.5.6",

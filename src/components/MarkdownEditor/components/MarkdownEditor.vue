@@ -11,6 +11,7 @@ import {
 import { setupMarkdownEditor } from '../utils/setup'
 import * as md from '../utils/markdown-toolbar'
 import { isToolbarMenu } from '../utils/toolbar'
+import { getMessages } from '../utils/i18n'
 import type { BuiltinTool, InsertGenerator, ToolbarContext, ToolbarEntry, ToolbarMenuItem, ToolbarGroup, ToolbarPlugin, ToolbarPluginPlacement } from '../models/markdown-toolbar.models'
 import type { MarkdownEditorEmits, MarkdownEditorProps, MarkdownEditorToolbarEntry, MarkdownEditorViewMode } from '../models/markdown-editor.models'
 import type { MarkdownEditorDropdownItem } from '../models/markdown-editor-dropdown-menu.models'
@@ -44,6 +45,7 @@ const emit = defineEmits<MarkdownEditorEmits>()
 const viewMode = ref<MarkdownEditorViewMode>(props.initialMode)
 const editorRef = useTemplateRef<ExposeParam>('editorRef')
 const expandedOpen = ref(false)
+const t = computed(() => getMessages(props.language))
 // Cada instância precisa do próprio id: o md-editor deriva dele os ids do mermaid/DOM, e a cópia
 // em tela cheia colidiria com a inline.
 const editorId = `mde-${useId()}`
@@ -59,7 +61,9 @@ const ctx: ToolbarContext = {
   insert: run,
   getValue: () => props.modelValue,
   setValue: value => emit('update:modelValue', value),
-  focus: () => editorRef.value?.focus()
+  focus: () => editorRef.value?.focus(),
+  getTheme: () => props.theme,
+  getLanguage: () => props.language
 }
 
 const videoInput = useTemplateRef<HTMLInputElement>('videoInput')
@@ -140,24 +144,24 @@ const groups = computed<MarkdownEditorToolbarEntry[][]>(() => {
   const visible = <T extends { key: string }>(list: T[]) => list.filter(e => !hidden.value.has(e.key))
 
   const headingItems = visible([
-    ...headingIcons.map((icon, i) => builtinItem(`h${i + 1}` as BuiltinTool, `Heading ${i + 1}`, icon, md.heading((i + 1) as 1 | 2 | 3 | 4 | 5 | 6))),
-    builtinItem('sub', 'Subscript', Subscript, md.sub),
-    builtinItem('sup', 'Superscript', Superscript, md.sup)
+    ...headingIcons.map((icon, i) => builtinItem(`h${i + 1}` as BuiltinTool, `${t.value.heading} ${i + 1}`, icon, md.heading((i + 1) as 1 | 2 | 3 | 4 | 5 | 6))),
+    builtinItem('sub', t.value.sub, Subscript, md.sub),
+    builtinItem('sup', t.value.sup, Superscript, md.sup)
   ]).concat(
     customItems(props.headingMenuItems),
     props.plugins.flatMap(p => customItems(p.headingMenuItems ?? [], pluginPrefix(p)))
   )
 
   const insertItems = visible([
-    builtinItem('quote', 'Quote', Quote, md.quote),
-    builtinItem('codeInline', 'Inline code', Code, md.codeInline),
-    builtinItem('codeBlock', 'Code block', SquareCode, md.codeBlock),
-    builtinItem('link', 'Link', Link, md.link),
-    builtinItem('image', 'Image', Image, md.image),
-    ...(props.onUploadImg ? [{ key: 'video', label: 'Video', icon: Video, onSelect: () => videoInput.value?.click() }] : []),
-    builtinItem('table', 'Table', Table, md.table),
-    builtinItem('mermaid', 'Diagram', Workflow, md.mermaid),
-    builtinItem('katex', 'Formula', Sigma, md.katex)
+    builtinItem('quote', t.value.quote, Quote, md.quote),
+    builtinItem('codeInline', t.value.codeInline, Code, md.codeInline),
+    builtinItem('codeBlock', t.value.codeBlock, SquareCode, md.codeBlock),
+    builtinItem('link', t.value.link, Link, md.link),
+    builtinItem('image', t.value.image, Image, md.image),
+    ...(props.onUploadImg ? [{ key: 'video', label: t.value.video, icon: Video, onSelect: () => videoInput.value?.click() }] : []),
+    builtinItem('table', t.value.table, Table, md.table),
+    builtinItem('mermaid', t.value.mermaid, Workflow, md.mermaid),
+    builtinItem('katex', t.value.katex, Sigma, md.katex)
   ]).concat(
     customItems(props.insertMenuItems),
     props.plugins.flatMap(p => customItems(p.insertMenuItems ?? [], pluginPrefix(p)))
@@ -168,18 +172,18 @@ const groups = computed<MarkdownEditorToolbarEntry[][]>(() => {
 
   const all: MarkdownEditorToolbarEntry[][] = [
     visible([
-      button('bold', 'Bold', Bold, md.bold),
-      button('italic', 'Italic', Italic, md.italic),
-      button('underline', 'Underline', Underline, md.underline),
-      button('strikeThrough', 'Strikethrough', Strikethrough, md.strikeThrough)
+      button('bold', t.value.bold, Bold, md.bold),
+      button('italic', t.value.italic, Italic, md.italic),
+      button('underline', t.value.underline, Underline, md.underline),
+      button('strikeThrough', t.value.strikeThrough, Strikethrough, md.strikeThrough)
     ]).concat(entriesInGroup('format')),
-    visible<MarkdownEditorToolbarEntry>([{ kind: 'menu', key: 'headings', title: 'Headings', icon: Heading, items: headingItems }]),
+    visible<MarkdownEditorToolbarEntry>([{ kind: 'menu', key: 'headings', title: t.value.headings, icon: Heading, items: headingItems }]),
     visible([
-      button('unorderedList', 'Bulleted list', List, md.unorderedList),
-      button('orderedList', 'Numbered list', ListOrdered, md.orderedList),
-      button('task', 'Task list', ListTodo, md.task)
+      button('unorderedList', t.value.unorderedList, List, md.unorderedList),
+      button('orderedList', t.value.orderedList, ListOrdered, md.orderedList),
+      button('task', t.value.task, ListTodo, md.task)
     ]).concat(entriesInGroup('lists')),
-    visible<MarkdownEditorToolbarEntry>([{ kind: 'menu', key: 'insert', title: 'Insert', icon: Plus, label: 'Insert', items: insertItems }]),
+    visible<MarkdownEditorToolbarEntry>([{ kind: 'menu', key: 'insert', title: t.value.insert, icon: Plus, label: t.value.insert, items: insertItems }]),
     ungrouped(props.toolbarButtons).map(e => customEntry(e)),
     // Plugins com placement 'toolbar': um grupo cada, na ordem do array.
     ...pluginsIn('toolbar').map(p => ungrouped(p.buttons).map(e => customEntry(e, pluginPrefix(p)))),
@@ -187,7 +191,7 @@ const groups = computed<MarkdownEditorToolbarEntry[][]>(() => {
     [{
       kind: 'menu',
       key: 'plugins',
-      title: 'More tools',
+      title: t.value.moreTools,
       icon: Ellipsis,
       items: pluginsIn('menu').flatMap(p => ungrouped(p.buttons).map(e => customMenuItem(e, pluginPrefix(p))))
     }]
@@ -281,7 +285,7 @@ defineExpose(ctx)
       <span
         v-else
         class="mde-label"
-      >Preview</span>
+      >{{ t.preview }}</span>
 
       <div class="mde-toolbar-group mde-toolbar-group--end">
         <button
@@ -290,7 +294,7 @@ defineExpose(ctx)
           :class="{ 'mde-btn--active': viewMode === 'editor' }"
           @click="viewMode = 'editor'"
         >
-          Editor
+          {{ t.editor }}
         </button>
         <button
           type="button"
@@ -298,7 +302,7 @@ defineExpose(ctx)
           :class="{ 'mde-btn--active': viewMode === 'preview' }"
           @click="viewMode = 'preview'"
         >
-          Preview
+          {{ t.preview }}
         </button>
         <template v-if="props.expanded">
           <slot name="actions" />
@@ -306,8 +310,8 @@ defineExpose(ctx)
           <button
             type="button"
             class="mde-btn"
-            title="Exit fullscreen (Esc)"
-            aria-label="Exit fullscreen"
+            :title="t.collapse"
+            :aria-label="t.collapseLabel"
             @click="emit('collapse')"
           >
             <Minimize2 class="mde-icon" />
@@ -318,8 +322,8 @@ defineExpose(ctx)
           <button
             type="button"
             class="mde-btn"
-            title="Expand editor"
-            aria-label="Expand editor"
+            :title="t.expand"
+            :aria-label="t.expand"
             @click="expandedOpen = true"
           >
             <Maximize2 class="mde-icon" />

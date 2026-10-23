@@ -333,3 +333,180 @@
 .md-editor-preview .md-editor-admonition-caution { --mde-adm: #d97706; }
 .md-editor-preview .md-editor-admonition-danger,
 .md-editor-preview .md-editor-admonition-error { --mde-adm: #dc2626; }
+
+/* ---------- diálogos (editor de tabela, exportar PDF) ---------- */
+.mde-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--mde-z) + 5);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.mde-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 480px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--mde-border);
+  border-radius: calc(var(--mde-radius) + 4px);
+  background: var(--mde-bg);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.4);
+}
+
+.mde-dialog--wide {
+  width: 870px;
+  height: 90vh;
+}
+
+.mde-dialog-header,
+.mde-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.mde-dialog-header {
+  border-bottom: 1px solid var(--mde-border);
+}
+
+.mde-dialog-footer {
+  justify-content: flex-end;
+  border-top: 1px solid var(--mde-border);
+}
+
+.mde-dialog-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mde-dialog-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+}
+
+.mde-dialog .mde-btn {
+  height: 28px;
+  padding: 0 10px;
+}
+
+.mde-dialog .mde-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.mde-btn--outline {
+  border: 1px solid var(--mde-border);
+}
+
+.mde-btn--primary,
+.mde-btn--primary:hover {
+  background: var(--mde-active-bg);
+  color: var(--mde-active-text);
+}
+
+.mde-counters {
+  display: flex;
+  gap: 16px;
+}
+
+.mde-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mde-counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mde-dialog .mde-counter-controls .mde-btn {
+  min-width: 24px;
+  padding: 0;
+}
+
+.mde-counter-value {
+  min-width: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mde-table-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mde-table-grid th,
+.mde-table-grid td {
+  min-width: 90px;
+  padding: 0;
+  border: 1px solid var(--mde-border);
+}
+
+.mde-table-grid th {
+  background: var(--mde-bg-elevated);
+}
+
+.mde-cell {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--mde-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.mde-cell:focus {
+  background: var(--mde-bg-hover);
+}
+
+.mde-cell--header {
+  font-weight: 600;
+}
+
+.mde-pdf-content .md-editor-code pre code .md-editor-code-block {
+  text-wrap: wrap;
+}
+
+/* Impressão: só o diálogo de exportação aparece, sem moldura nem rolagem. */
+@media print {
+  body > *:not(.mde-pdf) {
+    display: none !important;
+  }
+
+  .mde-pdf,
+  .mde-pdf .mde-dialog,
+  .mde-pdf .mde-dialog-body {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .mde-pdf .mde-dialog-header {
+    display: none !important;
+  }
+}

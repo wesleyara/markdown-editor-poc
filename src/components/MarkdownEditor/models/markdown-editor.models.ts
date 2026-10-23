@@ -11,7 +11,8 @@ export interface MarkdownEditorProps {
    * não insere imagens coladas. */
   onUploadImg?: UploadImgEvent
   theme?: Themes
-  /** Idioma dos textos internos do md-editor-v3 ('en-US' | 'zh-CN'). */
+  /** Idioma da UI: 'en-US' (padrão), 'pt-BR' ou 'zh-CN' (este só nos textos internos do md-editor-v3;
+   * a toolbar cai em inglês). */
   language?: string
   placeholder?: string
   /** Abre imagens do preview num lightbox com zoom/arrastar. */

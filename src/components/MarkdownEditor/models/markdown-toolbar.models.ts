@@ -1,5 +1,6 @@
 /** Tipos públicos para estender a toolbar do `MarkdownEditor`. */
 import type { Component } from 'vue'
+import type { Themes } from 'md-editor-v3'
 
 /** O que inserir e o que deixar selecionado depois. Semântica do md-editor-v3:
  * - `deviationStart`: deslocamento do início da seleção a partir do **início** do texto inserido;
@@ -25,6 +26,9 @@ export interface ToolbarContext {
   setValue: (value: string) => void
   /** Devolve o foco ao editor. */
   focus: () => void
+  /** Tema e idioma atuais do editor, para plugins que abrem UI própria (diálogos). */
+  getTheme: () => Themes
+  getLanguage: () => string
 }
 
 /** Botão extra na toolbar. Informe `icon`, `label` ou ambos. */

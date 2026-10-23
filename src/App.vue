@@ -3,8 +3,8 @@ import { computed, ref, watchEffect } from 'vue'
 import { CalendarDays, Eraser } from '@lucide/vue'
 import {
   MarkdownEditor, MarkdownView,
-  calloutsPlugin, copyMarkdownPlugin, dateTimePlugin, emojiPlugin, extraBlocksPlugin,
-  templatesPlugin, textTransformPlugin
+  calloutsPlugin, copyMarkdownPlugin, dateTimePlugin, emojiPlugin, exportPdfPlugin, extraBlocksPlugin,
+  tableEditorPlugin, templatesPlugin, textTransformPlugin
 } from './components/MarkdownEditor'
 import type { ToolbarButton, ToolbarPlugin } from './components/MarkdownEditor'
 import { tasksPlugin } from './docs/tasks-plugin'
@@ -84,6 +84,8 @@ const availablePlugins: Array<{ id: string, label: string, plugin: ToolbarPlugin
   { id: 'emoji', label: 'Emoji', plugin: emojiPlugin() },
   { id: 'templates', label: 'Modelos', plugin: templatesPlugin() },
   { id: 'case', label: 'Maiúsculas/minúsculas', plugin: textTransformPlugin() },
+  { id: 'table', label: 'Editor de tabela (menu Insert)', plugin: tableEditorPlugin() },
+  { id: 'pdf', label: 'Exportar PDF', plugin: exportPdfPlugin() },
   { id: 'blocks', label: 'Blocos extras (menu Insert)', plugin: extraBlocksPlugin() },
   {
     id: 'copy',

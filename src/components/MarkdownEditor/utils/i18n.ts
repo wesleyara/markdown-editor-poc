@@ -1,0 +1,91 @@
+/** Textos da UI própria do editor (toolbar, diálogos). Os textos internos do md-editor-v3 vêm do
+ * `language` dele; aqui cobrimos o que é nosso. Idiomas sem tradução caem em `en-US`. */
+const en = {
+  bold: 'Bold',
+  italic: 'Italic',
+  underline: 'Underline',
+  strikeThrough: 'Strikethrough',
+  headings: 'Headings',
+  heading: 'Heading',
+  sub: 'Subscript',
+  sup: 'Superscript',
+  unorderedList: 'Bulleted list',
+  orderedList: 'Numbered list',
+  task: 'Task list',
+  insert: 'Insert',
+  quote: 'Quote',
+  codeInline: 'Inline code',
+  codeBlock: 'Code block',
+  link: 'Link',
+  image: 'Image',
+  video: 'Video',
+  table: 'Table',
+  mermaid: 'Diagram',
+  katex: 'Formula',
+  moreTools: 'More tools',
+  editor: 'Editor',
+  preview: 'Preview',
+  expand: 'Expand editor',
+  collapse: 'Exit fullscreen (Esc)',
+  collapseLabel: 'Exit fullscreen',
+  exportPdf: 'Export as PDF',
+  exportPdfAction: 'Export',
+  close: 'Close',
+  tableEditor: 'Table editor',
+  tableColumns: 'Columns',
+  tableRows: 'Rows',
+  tableHeader: 'Header',
+  tableInsert: 'Insert table',
+  tableCancel: 'Cancel',
+  tableRemove: 'Remove',
+  tableAdd: 'Add'
+}
+
+export type MarkdownEditorMessages = typeof en
+
+const ptBR: MarkdownEditorMessages = {
+  bold: 'Negrito',
+  italic: 'Itálico',
+  underline: 'Sublinhado',
+  strikeThrough: 'Riscado',
+  headings: 'Títulos',
+  heading: 'Título',
+  sub: 'Subscrito',
+  sup: 'Sobrescrito',
+  unorderedList: 'Lista com marcadores',
+  orderedList: 'Lista numerada',
+  task: 'Lista de tarefas',
+  insert: 'Inserir',
+  quote: 'Citação',
+  codeInline: 'Código em linha',
+  codeBlock: 'Bloco de código',
+  link: 'Link',
+  image: 'Imagem',
+  video: 'Vídeo',
+  table: 'Tabela',
+  mermaid: 'Diagrama',
+  katex: 'Fórmula',
+  moreTools: 'Mais ferramentas',
+  editor: 'Editor',
+  preview: 'Preview',
+  expand: 'Expandir editor',
+  collapse: 'Sair da tela cheia (Esc)',
+  collapseLabel: 'Sair da tela cheia',
+  exportPdf: 'Exportar como PDF',
+  exportPdfAction: 'Exportar',
+  close: 'Fechar',
+  tableEditor: 'Editor de tabela',
+  tableColumns: 'Colunas',
+  tableRows: 'Linhas',
+  tableHeader: 'Cabeçalho',
+  tableInsert: 'Inserir tabela',
+  tableCancel: 'Cancelar',
+  tableRemove: 'Remover',
+  tableAdd: 'Adicionar'
+}
+
+const catalog: Record<string, MarkdownEditorMessages> = { 'en-US': en, 'pt-BR': ptBR }
+
+export function getMessages(language: string): MarkdownEditorMessages {
+  return catalog[language] ?? en
+}

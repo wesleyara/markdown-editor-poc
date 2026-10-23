@@ -3,6 +3,8 @@
  * desligamos o que não é usado), então o editor funciona offline e na versão que o pacote declara em
  * `dependencies`. É idempotente — pode ser chamado várias vezes. */
 import { config } from 'md-editor-v3'
+import { lineNumbers } from '@codemirror/view'
+import PT_BR from '@vavt/cm-extension/dist/locale/pt-BR'
 import mermaid from 'mermaid'
 import katex from 'katex'
 import hljs from 'highlight.js'
@@ -24,6 +26,11 @@ export function setupMarkdownEditor() {
   if (typeof document !== 'undefined') void document.fonts?.load('16px "Recursive Variable"')
 
   config({
+    // Números de linha na área de edição (a toolbar nativa do md-editor não é usada, então o
+    // CodeMirror vem sem eles).
+    codeMirrorExtensions: extensions => [...extensions, { type: 'lineNumbers', extension: lineNumbers() }],
+    // Traduções do md-editor-v3 além de en-US/zh-CN; use com `language="pt-BR"`.
+    editorConfig: { languageUserDefined: { 'pt-BR': PT_BR } },
     // `![video](url)` vira um <video> reproduzível; uploads de vídeo são inseridos com esse alt.
     markdownItConfig(md) {
       const defaultImage = md.renderer.rules.image
